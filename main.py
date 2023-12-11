@@ -527,11 +527,11 @@ class Thread(QThread):
         title = ['날짜','기업명','매수/매도','이번보고서 주식수(주)','변동주식 수(주)','발행주식 총수(주)','비율(E/F)','주식비율(D/F)','총금액', '변동일','매매임원', '링크']
         ws.append(title)
 
-        # # ================id가져오기
-        # idList = GetID(self.year, self.month, self.day)
-        # text = "ID가져오기 완료"
-        # self.user_signal.emit(text)
-        # # ================
+        # ================id가져오기
+        idList = GetID(self.year, self.month, self.day)
+        text = "ID가져오기 완료"
+        self.user_signal.emit(text)
+        # ================
         with open('idList.json', "r", encoding='utf-8-sig') as f:
             idList = json.load(f)
 
