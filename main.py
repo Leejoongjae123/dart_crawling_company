@@ -524,7 +524,7 @@ class Thread(QThread):
         # 엑셀양식만들기
         wb = openpyxl.Workbook()
         ws = wb.active
-        title = ['날짜','기업명','매수/매도','이번보고서 주식수(주)','변동주식 수(주)','발행주식 총수(주)','비율(E/F)','주식비율(D/F)','총금액', '변동일','매매임원', '링크']
+        title = ['날짜','기업명','매매임원','매수/매도','이번보고서 주식수(주)','변동주식 수(주)','발행주식 총수(주)','비율(E/F)','주식비율(D/F)','총금액', '변동일', '링크']
         ws.append(title)
 
         # ================id가져오기
@@ -572,10 +572,12 @@ class Thread(QThread):
                 continue
             print("데이타저장")
             pprint.pprint(results)
-            dataRow = [results['reportDate'],idInfo['title'],results['saleType'], results['thisStock'],results['JGStock'],results['totalStock'],results['JGRatio'],
-                       results['thisRatio'],results['totalValue'],period,results['chair']+","+results['name'],results['url']]
+            dataRow = [results['reportDate'],idInfo['title'],results['chair']+","+results['name'],results['saleType'], results['thisStock'],results['JGStock'],results['totalStock'],results['JGRatio'],
+                       results['thisRatio'],results['totalValue'],period,results['url']]
+            print("dataRow:",dataRow,"/ dataRow_TYPE:",type(dataRow))
             ws.append(dataRow)
             wb.save('전자공시조회_{}.xlsx'.format(timeNow))
+            # wb.save('result.xlsx')
 
 
         # 전체 행에 자동 줄바꿈 설정
@@ -613,20 +615,24 @@ class Thread(QThread):
         # 데이터 읽기 (헤더 제외)
         rows = list(ws.iter_rows(values_only=True))
         header, data = rows[0], rows[1:]
-
+        
+        print("data:",data,"/ data_TYPE:",type(data))
+        
         # '장내매수', '장내매수매도', '장내매도' 행을 분리하여 정렬
-        buyers = [row for row in data if row[2] == '장내매수']
-        buyers_sellers = [row for row in data if row[2] == '장내매수매도']
-        sellers = [row for row in data if row[2] == '장내매도']
-
+        buyers = [row for row in data if row[3] == '장내매수']
+        buyers_sellers = [row for row in data if row[3] == '장내매수매도']
+        sellers = [row for row in data if row[3] == '장내매도']
+        
+        
         # 데이터를 다시 합치기
         sorted_data = buyers + buyers_sellers + sellers
 
+        
         # 기존 데이터 지우기
         for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
             for cell in row:
                 cell.value = None
-
+        #
         # 정렬된 데이터 쓰기
         for row_index, row in enumerate(sorted_data, start=2):
             for col_index, value in enumerate(row, start=1):
@@ -640,13 +646,13 @@ class Thread(QThread):
         }
 
         # 3번째 열의 셀을 순회하며 글자색 변경
-        for row in ws.iter_rows(min_row=2, max_col=3, max_row=ws.max_row):
-            cell = row[2]  # 3번째 열의 셀
+        for row in ws.iter_rows(min_row=2, max_col=4, max_row=ws.max_row):
+            cell = row[3]  # 3번째 열의 셀
             if cell.value in colors:
                 cell.font = Font(color=colors[cell.value])
 
         # 첫 번째 행 고정
-        ws.freeze_panes = 'A2'
+        ws.freeze_panes = 'A1'
 
         # # 전체 열에 필터 적용
         ws.auto_filter.ref = ws.dimensions
