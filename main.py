@@ -391,7 +391,8 @@ def GetInfos(data):
             if td.get_text().find("장내매수")>=0 and td.get_text().find("이상")<0:
                 print('4124124')
                 try:
-                    changeAmt = int(tds[index + 4].get_text().strip().replace(",", ""))
+                    # changeAmt = int(tds[index + 4].get_text().strip().replace(",", ""))
+                    changeAmt = int(re.sub(r'[^0-9]', '', tds[index + 4].get_text().strip()))
                     print("changeAmt:", changeAmt, "/ changeAmt_TYPE:", type(changeAmt))
                 except:
                     changeAmt=0
@@ -399,8 +400,10 @@ def GetInfos(data):
                 if changeAmt==0:
                     continue
                 try:
-                    changePrice = int(tds[index + 6].get_text().strip().replace(",", ""))
+                    # changePrice = int(tds[index + 6].get_text().strip().replace(",", ""))
+                    changePrice = int(re.sub(r'[^0-9]', '', tds[index + 6].get_text().strip()))
                     print("changePrice:", changePrice, "/ changePrice_TYPE:", type(changePrice))
+
                 except:
                     changePrice=0
                 print("changePrice:",changePrice)
@@ -417,13 +420,16 @@ def GetInfos(data):
             elif td.get_text().find("장내매도")>=0 and td.get_text().find("이상")<0:
                 print('1234')
                 try:
-                    changeAmt=int(tds[index+4].get_text().strip().replace(",",""))
+                    # changeAmt=int(tds[index+4].get_text().strip().replace(",",""))
+                    # 정규표현식을 사용하여 쉼표 및 숫자 이외의 문자 제거
+                    changeAmt=int(re.sub(r'[^0-9]', '', tds[index+4].get_text().strip()))
                 except:
                     continue
-                print("changeAmt:",changeAmt)
                 print("changeAmt:",changeAmt,"/ changeAmt_TYPE:",type(changeAmt))
                 try:
-                    changePrice=int(tds[index+6].get_text().strip().replace(",","").replace("처분","").replace("(","").replace(")","").replace("원",""))
+                    # changePrice=int(tds[index+6].get_text().strip().replace(",","").replace("처분","").replace("(","").replace(")","").replace("원",""))
+                    print('changePrice11',tds[index+6].get_text().strip())
+                    changePrice=int(re.sub(r'[^0-9]', '', tds[index+6].get_text().strip()))
                 except:
                     print("에러인듯")
                     continue
@@ -656,7 +662,6 @@ class Thread(QThread):
 
         # # 전체 열에 필터 적용
         ws.auto_filter.ref = ws.dimensions
-
 
         wb.save('전자공시조회_{}.xlsx'.format(timeNow))
 
