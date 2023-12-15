@@ -42,6 +42,14 @@ from openpyxl.styles import Alignment
 from openpyxl.styles import Font
 from openpyxl.styles import PatternFill
 
+# Function to format the numbers
+def format_number(num):
+    # If the second decimal is zero, display up to three decimal places
+    if round(num, 2) == round(num, 1):
+        return f"{num:.3f}"
+    # Otherwise, display up to two decimal places
+    else:
+        return f"{num:.2f}"
 def GetID(category,year,month,day):
     count=1
     endFlag=False
@@ -633,7 +641,9 @@ def GetInfos2(idInfo):
         for number in changeReasonValueList:
             changeReasonValueTotal += number
         print("changeReasonValueTotal:",changeReasonValueTotal,"/ changeReasonValueTotal_TYPE:",type(changeReasonValueTotal))
-        changeReasonValueTotalRatio=str(round(changeReasonValueTotal/int(totalStock.replace(",",""))*100,2))
+
+        changeReasonValueTotalRatio=format_number(changeReasonValueTotal/int(totalStock.replace(",",""))*100)
+
         print("changeReasonValueTotalRatio:",changeReasonValueTotalRatio,"/ changeReasonValueTotalRatio_TYPE:",type(changeReasonValueTotalRatio))
         # 숫자를 세 자리 쉼표로 처리하는 문자열 생성
         changeReasonValueTotal = "{:,}".format(changeReasonValueTotal)
@@ -717,7 +727,6 @@ class Thread(QThread):
         text = "ID가져오기 시작"
         self.user_signal.emit(text)
         # 엑셀양식만들기
-
 
         wb = openpyxl.Workbook()
         ws = wb.active
